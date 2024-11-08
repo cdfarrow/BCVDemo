@@ -182,21 +182,13 @@ class SmartReferenceControl(wx.ComboCtrl):
                     # Still ambiguous, so keep the user's edits by not refreshing.
                     return
                 else:
-                    # If the user is editing inside the string, clear
-                    # everything after the cursor.
-                    cutoff = self.GetInsertionPoint()
-                    if cutoff == len(text):
-                        cutoff = -1     # Remove the last chr entered
-
+                    # Igore (i.e. delete) the last character entered since
+                    # it doesn't match anything.
+                    
                     self.__refreshing = True
-                    self.SetValue(text[:cutoff])
+                    self.SetValue(text[:-1])
                     self.__refreshing = False
                     self.SetInsertionPointEnd()
-                    if cutoff != -1:
-                        # SetValue() will trigger another EVT_TEXT with the cursor
-                        # at 0, so we bypassed that above, and now call ourselves
-                        # to re-evaluate the string for auto-completion.
-                        self.OnEdited(None)
                     return
 
         self.__RefreshValue()

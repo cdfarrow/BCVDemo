@@ -11,6 +11,7 @@ import wx
 import re
 
 from ..SmartReference import BibleBooks
+from ..SmartReference import SmartReference
 
 #-----------------------------------------------------------
 # RE for valid "Book Chapter" strings
@@ -114,26 +115,20 @@ class SmartReferenceControl(wx.ComboCtrl):
         for bk in BibleBooks.Books():
             self.popup.AddItem(bk)
 
-        self.Book = ref[0]
-        self.Chapter = ref[1]
+        self.SR = SmartReference.SmartReference()
         self.__refreshing = False
         self.__RefreshValue()
 
     def __SendReference(self):
-        #print "Sending Reference Event:", (self.Book, self.Chapter)
+        #print "Sending Reference Event:", (self.SR.Book, self.SR.Chapter)
         evt = ReferenceEvent(myEVT_REFERENCE_UPDATED, self.GetId())
-        evt.SetReference((self.Book, self.Chapter))
+        evt.SetReference((self.SR.Book, self.SR.Chapter))
         self.GetEventHandler().ProcessEvent(evt)
 
     def __RefreshValue(self):
-        print("__RefreshValue", self.Book, self.Chapter)
-        if self.Book == 0:
-            newValue = ""
-        elif self.Chapter == 0:
-            newValue = BibleBooks.Book(self.Book)+" "
-        else:
-            newValue = " ".join((BibleBooks.Book(self.Book),
-                                 str(self.Chapter)))
+        print("__RefreshValue", self.SR.Book, self.SR.Chapter)
+        newValue = self.SR.Value()
+
         if newValue != self.GetValue():
             self.__refreshing = True
             self.SetValue(newValue)         # Invokes OnEdited()
@@ -144,66 +139,27 @@ class SmartReferenceControl(wx.ComboCtrl):
         if self.__refreshing: return
 
         text = self.GetValue()
-        print (f"OnEdited [{text}]")
-        if not text:
-            self.Book = 0
-            self.Chapter = 0
+        
+        newValue = self.SR.Input(text)
+        
+        if newValue is False:
             return
 
-        if m := referenceRE.match(text):         # Match from beginning of the string
-            text = m.group(0)        # Truncate to the valid text in case of extra chrs (e.g. ':')
-            self.Book = BibleBooks.Lookup(text)
-            if self.Book:
-                self.Chapter = int(text.split()[-1])
-                # Make sure that Book & Chapter are consistent.
-                if self.Chapter < 1:
-                    self.Chapter = 1
-                if self.Chapter > BibleBooks.Chapters(self.Book):
-                    self.Chapter = BibleBooks.Chapters(self.Book)
-            else:
-                # Invalid book name, reset
-                self.Book = 0
-                self.Chapter = 0
-        else:
-            # The user is typing a name
-            self.Chapter = 0
-            idx = BibleBooks.Lookup(text)
-            if idx:
-                fullName = BibleBooks.Book(idx)
-                if text == fullName:
-                    # Full name without space, so the user must have pressed
-                    # Backspace. Clear the field.
-                    self.Book = 0
-                    self.Chapter = 0
-                else:
-                    # Auto-complete the book name
-                    self.Book = idx
-            else:
-                # Check for a valid sequence
-                if BibleBooks.ValidPrefix(text):
-                    # Still ambiguous, so keep the user's edits by not refreshing.
-                    return
-                else:
-                    # Igore (i.e. delete) the last character entered since
-                    # it doesn't match anything.
-                    
-                    self.__refreshing = True
-                    self.SetValue(text[:-1])
-                    self.__refreshing = False
-                    self.SetInsertionPointEnd()
-                    return
-
-        self.__RefreshValue()
+        if newValue != self.GetValue():
+            self.__refreshing = True
+            self.SetValue(newValue)         # Invokes OnEdited()
+            self.__refreshing = False
+            self.SetInsertionPointEnd()
 
     def SetReferenceHandler(self, handler):
         self.Bind(EVT_REFERENCE_UPDATED, handler)
     def OnEnterKey(self, event):
         fix = False
-        if self.Book == 0:
-            self.Book = 1
+        if self.SR.Book == 0:
+            self.SR.Book = 1
             fix = True
-        if self.Chapter == 0:
-            self.Chapter = 1
+        if self.SR.Chapter == 0:
+            self.SR.Chapter = 1
             fix = True
         if fix:
             # Show the corrected value
@@ -211,16 +167,16 @@ class SmartReferenceControl(wx.ComboCtrl):
         self.__SendReference()
 
     def NextChapter(self):
-        if self.Book > 0:
-            if self.Chapter < BibleBooks.Chapters(self.Book):
-                self.Chapter += 1
+        if self.SR.Book > 0:
+            if self.SR.Chapter < BibleBooks.Chapters(self.SR.Book):
+                self.SR.Chapter += 1
                 self.__RefreshValue()
                 self.__SendReference()
 
     def PreviousChapter(self):
-        if self.Book > 0:
-            if self.Chapter > 1:
-                self.Chapter -= 1
+        if self.SR.Book > 0:
+            if self.SR.Chapter > 1:
+                self.SR.Chapter -= 1
                 self.__RefreshValue()
                 self.__SendReference()
 

@@ -1,0 +1,11 @@
+[project]
+name = "BCVDemo"
+version = "0.0.1"
+description = "Demo of SmartReference Scripture selector"
+dependencies = [
+  "wxpython",
+]
+
+[build-system]
+build-backend = "flit_core.buildapi"
+requires = ["flit_core >=3.2,<4"]

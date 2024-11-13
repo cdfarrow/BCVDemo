@@ -10,3 +10,8 @@ The SmartReference class implements a Scripture reference selector for Book and 
 + Smart back-space: clears the whole bookname if Backspace is pressed when there is no chapter number.
 + Case is ignored; the reference is always formatted in title caps.
 + For multi-lingual support, a custom abbreviation list would be created per UI locale.
+
+## Instructions
++ Download the code with git or as a zip file.
++ Install wxpython with `py -m pip install wxpython`
++ From the top-level directory run BCV.vbs (Windows) or `py -m BCVDemo.wx` from the command line.

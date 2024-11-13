@@ -1,7 +1,7 @@
 The SmartReference class implements a Scripture reference selector for Book and Chapter. The main features are:
 
 + Auto-completes the full book name once it is unambiguous. This means, in most cases, that the user just needs to type a couple of letters to get the full book name. E.g. 'pr' for Proverbs, 'ps' for Psalms, '1j' for 1 John, and the single letter 't' for Titus. Some books need a longer sequence to distinguish them, the worst case in English being 'phile' for Philemon vs 'phili' for Philippians.
-+ Common book abbreviations are also supported such as 'mk' for Mark. For the two 'Ph' books above, the abbreviations 'phm' and 'php' are supported. Additionally, extra two-letter abbreviations are defined as shortcuts for books with common prefixes. E.g. 'ek' for Ezekiel vs 'er' for Ezra; 'hb' for Habakkuk and 'Hg' for Haggai. These can be changed as desired.
++ Common book abbreviations are also supported such as 'mk' for Mark. For the two 'Ph' books above, the abbreviations 'phm' and 'php' are supported. Additionally, extra two-letter abbreviations are defined as shortcuts for books with common prefixes. E.g. 'ek' for Ezekiel vs 'er' for Ezra; 'hb' for Habakkuk and 'hg' for Haggai. These can be changed as desired.
 + Standard 3-letter book abbreviations are supported for pasting references. [Known limitation: JUD doesn't work as it conflicts with Judges and is not unambiguous.] 
 + Accepts space or no space between # and book name (e.g. '1k' or '1 k' for 1 Kings).
 + Extra letters are ignored once the book name is completed so there's no problem if the user types more than needed. (Such as quickly typing 'gen' when 'ge' is sufficient to select Genesis.)

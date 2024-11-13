@@ -6,7 +6,7 @@
 #
 
 import wx
-from SmartReferenceControl import SmartReferenceControl
+from . import SmartReferenceControl
 
 #----------------------------------------------------------- 
 
@@ -16,7 +16,8 @@ class TestPanel(wx.Panel):
 
         fgs = wx.FlexGridSizer(cols=3, hgap=10, vgap=10)
 
-        self.smartRef = SmartReferenceControl(self, size=(250,-1))
+        self.smartRef = SmartReferenceControl.SmartReferenceControl(
+                            self, size=(250,-1))
         self.smartRef.SetReferenceHandler(self.OnNewReference)
         fgs.Add(self.smartRef)
         fgs.Add((10,10))
@@ -68,9 +69,5 @@ class App(wx.App):
         self.SetTopWindow(frame)
         return True
 
-#------------------------------------------------------------------------
-if __name__ == '__main__':
-    app = App(False)
-    app.MainLoop()
 
 

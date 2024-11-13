@@ -1,4 +1,3 @@
 Set WshShell = CreateObject("WScript.Shell")
-WshShell.CurrentDirectory = "Code"
-WshShell.Run "py BCVDemo.py", 0
+WshShell.Run "py -m BCVDemo.wx", 0
 WshShell = Null

@@ -3,12 +3,14 @@
 #
 #   A Wx control for typing or selecting a Scripture Book+Chapter reference.
 #
+#   Craig Farrow
+#   2012-2024
 #
 
 import wx
 import re
 
-import BBooks
+from ..SmartReference import BibleBooks
 
 #-----------------------------------------------------------
 # RE for valid "Book Chapter" strings
@@ -109,7 +111,7 @@ class SmartReferenceControl(wx.ComboCtrl):
 
         self.popup = ListCtrlComboPopup()
         self.SetPopupControl(self.popup)
-        for bk in BBooks.Books():
+        for bk in BibleBooks.Books():
             self.popup.AddItem(bk)
 
         self.Book = ref[0]
@@ -128,9 +130,9 @@ class SmartReferenceControl(wx.ComboCtrl):
         if self.Book == 0:
             newValue = ""
         elif self.Chapter == 0:
-            newValue = BBooks.Book(self.Book)+" "
+            newValue = BibleBooks.Book(self.Book)+" "
         else:
-            newValue = " ".join((BBooks.Book(self.Book),
+            newValue = " ".join((BibleBooks.Book(self.Book),
                                  str(self.Chapter)))
         if newValue != self.GetValue():
             self.__refreshing = True
@@ -150,14 +152,14 @@ class SmartReferenceControl(wx.ComboCtrl):
 
         if m := referenceRE.match(text):         # Match from beginning of the string
             text = m.group(0)        # Truncate to the valid text in case of extra chrs (e.g. ':')
-            self.Book = BBooks.Lookup(text)
+            self.Book = BibleBooks.Lookup(text)
             if self.Book:
                 self.Chapter = int(text.split()[-1])
                 # Make sure that Book & Chapter are consistent.
                 if self.Chapter < 1:
                     self.Chapter = 1
-                if self.Chapter > BBooks.Chapters(self.Book):
-                    self.Chapter = BBooks.Chapters(self.Book)
+                if self.Chapter > BibleBooks.Chapters(self.Book):
+                    self.Chapter = BibleBooks.Chapters(self.Book)
             else:
                 # Invalid book name, reset
                 self.Book = 0
@@ -165,9 +167,9 @@ class SmartReferenceControl(wx.ComboCtrl):
         else:
             # The user is typing a name
             self.Chapter = 0
-            idx = BBooks.Lookup(text)
+            idx = BibleBooks.Lookup(text)
             if idx:
-                fullName = BBooks.Book(idx)
+                fullName = BibleBooks.Book(idx)
                 if text == fullName:
                     # Full name without space, so the user must have pressed
                     # Backspace. Clear the field.
@@ -178,7 +180,7 @@ class SmartReferenceControl(wx.ComboCtrl):
                     self.Book = idx
             else:
                 # Check for a valid sequence
-                if BBooks.ValidPrefix(text):
+                if BibleBooks.ValidPrefix(text):
                     # Still ambiguous, so keep the user's edits by not refreshing.
                     return
                 else:
@@ -210,7 +212,7 @@ class SmartReferenceControl(wx.ComboCtrl):
 
     def NextChapter(self):
         if self.Book > 0:
-            if self.Chapter < BBooks.Chapters(self.Book):
+            if self.Chapter < BibleBooks.Chapters(self.Book):
                 self.Chapter += 1
                 self.__RefreshValue()
                 self.__SendReference()
